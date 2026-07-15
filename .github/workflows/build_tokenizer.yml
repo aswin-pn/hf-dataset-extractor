@@ -1,0 +1,29 @@
+name: Build Malayalam Tokenizer
+
+on:
+  workflow_dispatch: # Allows manual trigger from Actions tab
+
+jobs:
+  build-tokenizer:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install huggingface_hub
+
+      - name: Run Tokenizer Builder and Upload
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          PYTHONUNBUFFERED: 1
+        run: python build_tokenizer.py
