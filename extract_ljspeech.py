@@ -12,10 +12,10 @@ def main():
     api = HfApi(token=token)
     repo_id = "A-s-w-in/malayalam-tts-ljspeech"
     
-    print(f"Creating/Checking repository: {repo_id}")
+    print(f"Creating/Checking repository: {repo_id}", flush=True)
     create_repo(repo_id=repo_id, repo_type="dataset", exist_ok=True, token=token)
     
-    print("Loading source dataset in streaming mode...")
+    print("Loading source dataset in streaming mode...", flush=True)
     ds = load_dataset("A-s-w-in/malayalam-tts-preprocess", split="train", streaming=True)
     
     batch_size = 1000  # Upload in chunks of 1000 audio files to prevent timeouts
@@ -62,14 +62,14 @@ def main():
         batch_count += 1
         
         if processed_total % 100 == 0:
-            print(f"Processed {processed_total} valid files...")
+            print(f"Processed {processed_total} valid files...", flush=True)
         
         # When we hit the batch size, upload to Hugging Face
         if batch_count >= batch_size:
             # Copy the up-to-date metadata file into the batch folder so it gets uploaded
             shutil.copy(metadata_path, os.path.join(batch_dir, "metadata_ljspeech.csv"))
             
-            print(f"Uploading batch of {batch_size} files... (Total processed so far: {processed_total})")
+            print(f"Uploading batch of {batch_size} files... (Total processed so far: {processed_total})", flush=True)
             api.upload_folder(
                 folder_path=batch_dir,
                 repo_id=repo_id,

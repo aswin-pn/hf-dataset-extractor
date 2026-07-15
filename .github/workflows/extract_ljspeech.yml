@@ -28,4 +28,5 @@ jobs:
       - name: Run LJSpeech Extraction and Upload
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          PYTHONUNBUFFERED: 1
         run: python extract_ljspeech.py
