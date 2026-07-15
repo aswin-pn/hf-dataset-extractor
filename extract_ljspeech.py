@@ -31,13 +31,16 @@ def main():
     
     # This is the directory we will sync to Hugging Face
     batch_dir = "current_batch"
-    wavs_dir = os.path.join(batch_dir, "wavs")
-    os.makedirs(wavs_dir, exist_ok=True)
     
     iterator = iter(ds)
     
-    print("Starting processing...")
+    print("Starting processing...", flush=True)
     for ex in iterator:
+        # Determine which shard folder to put this file into (e.g. 5000 files per shard)
+        shard_index = processed_total // 5000
+        current_wavs_dir = os.path.join(batch_dir, "wavs", f"shard_{shard_index:03d}")
+        os.makedirs(current_wavs_dir, exist_ok=True)
+
         dur = ex["duration"]
         if dur < 0.5 or dur > 16.0:
             skipped += 1
@@ -45,9 +48,9 @@ def main():
             
         fname = f"ml_{processed_total:07d}"
         
-        # write wav to the batch folder
+        # write wav to the sharded batch folder
         audio = ex["audio"]
-        out_path = os.path.join(wavs_dir, f"{fname}.wav")
+        out_path = os.path.join(current_wavs_dir, f"{fname}.wav")
         sf.write(out_path, audio["array"], audio["sampling_rate"])
         
         # collect metadata
@@ -76,11 +79,10 @@ def main():
                 repo_type="dataset",
                 commit_message=f"Upload batch up to {processed_total} files"
             )
-            print("Upload complete. Clearing local batch folder to save disk space...")
+            print("Upload complete. Clearing local batch folder to save disk space...", flush=True)
             
             # Clean up the batch wavs so we don't re-upload them or run out of disk space
-            shutil.rmtree(wavs_dir)
-            os.makedirs(wavs_dir, exist_ok=True)
+            shutil.rmtree(os.path.join(batch_dir, "wavs"))
             batch_count = 0
             
     # Upload any remaining files in the final batch
