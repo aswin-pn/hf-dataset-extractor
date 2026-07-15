@@ -10,7 +10,7 @@ def main():
 
     print("Loading dataset 'ai4bharat/indicvoices_r' for Malayalam...")
     # This downloads the Malayalam split
-    dataset = load_dataset('ai4bharat/indicvoices_r', 'Malayalam')
+    dataset = load_dataset('ai4bharat/indicvoices_r', 'Malayalam', token=token)
     
     print("Dataset loaded successfully.")
     
